@@ -1,0 +1,57 @@
+name: Update Repository List
+
+# Triggered on a schedule, manually, or via a repository_dispatch event.
+#
+# To get near-real-time updates when org repos are created/deleted/renamed,
+# configure an organisation webhook (Settings → Webhooks) with event type
+# "Repositories" and point it at the GitHub Actions REST API:
+#   POST https://api.github.com/repos/ftsrg-papers/ftsrg-papers.github.io/dispatches
+#   body: {"event_type":"repos-changed"}
+# The webhook needs a fine-grained PAT with "actions:write" stored as a
+# webhook secret / passed as a Bearer token.
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [repos-changed]
+
+# Only one run at a time, globally (group is not scoped to a branch).
+# Any queued run is cancelled when a newer one arrives.
+concurrency:
+  group: update-repos
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # needed to commit repos.json back
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install --quiet pyyaml
+
+      - name: Update repos.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/update_repos.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet repos.json; then
+            echo "repos.json is up to date — nothing to commit."
+          else
+            git add repos.json
+            git commit -m "chore: update repository list [skip ci]"
+            git push
+          fi
