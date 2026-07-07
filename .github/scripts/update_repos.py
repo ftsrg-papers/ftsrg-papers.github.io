@@ -69,30 +69,18 @@ _ENTRY_RE = re.compile(r"@\w+\{.*?^\}", re.MULTILINE | re.DOTALL)
 def rewrite_bib(content: str, repo_name: str) -> str:
     """Patch every BibTeX entry in *content* for use in the org index:
 
-    1. Replace  ./path  with  /repo-name/path  in all url-type fields.
-    2. Set  url = {/repo-name/}  so BibBase links the title to the
-       repo’s gh-pages site (adds the field if absent, overrides if present).
+    Replace  ./path  with  /repo-name/path  in all url-type fields so that
+    relative asset links resolve correctly from the org index page.
+    The title link is fixed client-side in index.html.
     """
     base = f"/{repo_name}/"
 
-    # 1. Rewrite relative paths in any url / url_* field
-    content = re.sub(
+    # Rewrite relative paths in any url / url_* field
+    return re.sub(
         r"(url\w*\s*=\s*\{)\./",
         lambda m: m.group(1) + base,
         content,
     )
-
-    # 2. Per-entry: set/override the plain `url` field
-    def _patch(m: re.Match) -> str:
-        entry = m.group(0)
-        replacement = f"url = {{{base}}}"
-        if re.search(r"\burl\s*=", entry):
-            # Override the existing value (url values never contain braces)
-            return re.sub(r"\burl\s*=\s*\{[^}]*\}", replacement, entry)
-        # Inject before the closing } of the entry
-        return re.sub(r"(^\})", f"  {replacement},\n\\1", entry, flags=re.MULTILINE)
-
-    return _ENTRY_RE.sub(_patch, content)
 
 
 def main() -> None:

@@ -249,6 +249,26 @@
     <script src="https://bibbase.org/show?bib=https%3A%2F%2Fftsrg-papers.github.io%2Fpublications.bib&jsonp=1&theme=simple&group0=year&sort0=year&sortDir0=desc&showSearch=true&owner=none"></script>
   </main>
 
+  <script>
+    // BibBase links paper titles to url_pdf by default.
+    // We rewrite those links to the repo's gh-pages root (/repo-name/)
+    // by stripping everything after the first path segment.
+    function fixTitleLinks() {
+      document.querySelectorAll('span.bibbase_paper_title a').forEach(a => {
+        const href = a.getAttribute('href') || '';
+        const m = href.match(/^(\/[\w.+-]+\/)/);
+        if (m) a.href = m[1];  // /repo-name/paper.pdf  →  /repo-name/
+      });
+    }
+
+    // Run once immediately (entries already in DOM) and again on each
+    // mutation so dynamically injected entries are also patched.
+    const _bibDiv = document.querySelector('main');
+    new MutationObserver(fixTitleLinks)
+      .observe(_bibDiv, { subtree: true, childList: true });
+    fixTitleLinks();
+  </script>
+
   <footer>
     <a href="https://github.com/ftsrg-papers"
        target="_blank" rel="noopener noreferrer">github.com/ftsrg-papers</a>
