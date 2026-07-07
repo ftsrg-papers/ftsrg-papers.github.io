@@ -246,46 +246,8 @@
   </header>
 
   <main>
-    <script src="https://bibbase.org/show?bib=https%3A%2F%2Fftsrg-papers.github.io%2Fpublications.bib&jsonp=1&theme=simple&group0=year&sort0=year&sortDir0=desc&showSearch=true&owner=none"></script>
+    <script src="https://bibbase.org/show?bib=https%3A%2F%2Fftsrg-papers.github.io%2Fpublications.bib&jsonp=1&theme=simple&group0=year&sort0=year&sortDir0=desc&showSearch=true&owner=none&urlLabel=supplementary%20materials&noTitleLinks=true"></script>
   </main>
-
-  <script>
-    // Rewrite BibBase title links from url_pdf (./paper.pdf → /repo-name/paper.pdf)
-    // to the repo's gh-pages root (/repo-name/).
-    (function () {
-      const host = location.hostname; // ftsrg-papers.github.io
-
-      function fixTitleLinks() {
-        // Cover BibBase title selectors across themes and versions
-        document.querySelectorAll(
-          '.bibbase_paper_title a, ' +        // theme=simple / default
-          '.bibbase_paper_titleauthors b a, ' + // older table layout
-          '.bibbase_paper > b > a'              // minimal themes
-        ).forEach(a => {
-          const href = a.getAttribute('href') || '';
-          // Normalise to a root-relative path
-          let path = '';
-          if (href.startsWith('/')) {
-            path = href;
-          } else if (href.includes('://' + host + '/')) {
-            // Absolute URL pointing at our own site
-            path = href.slice(href.indexOf('://' + host) + 3 + host.length);
-          }
-          if (!path) return;
-          const m = path.match(/^\/([\w.+-]+)\//);
-          if (m) a.href = '/' + m[1] + '/';
-        });
-      }
-
-      // MutationObserver catches BibBase DOM insertions
-      new MutationObserver(fixTitleLinks)
-        .observe(document.querySelector('main') || document.body,
-                 { subtree: true, childList: true });
-
-      // Polling fallback for cached/fast JSONP loads
-      [0, 300, 1000, 3000].forEach(ms => setTimeout(fixTitleLinks, ms));
-    }());
-  </script>
 
   <footer>
     <a href="https://github.com/ftsrg-papers"
