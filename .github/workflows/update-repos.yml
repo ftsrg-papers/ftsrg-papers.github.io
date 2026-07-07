@@ -22,7 +22,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write   # needed to commit repos.json back
+  contents: write   # needed to commit publications.bib back
 
 jobs:
   update:
@@ -35,10 +35,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
-        run: pip install --quiet pyyaml
-
-      - name: Update repos.json
+      - name: Update publications.bib
         env:
           # ORG_READ_TOKEN: fine-grained PAT with Contents:read + Metadata:read
           # on all org repos — required to include private repositories.
@@ -51,10 +48,10 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet repos.json; then
-            echo "repos.json is up to date — nothing to commit."
+          if git diff --quiet publications.bib; then
+            echo "publications.bib is up to date — nothing to commit."
           else
-            git add repos.json
-            git commit -m "chore: update repository list [skip ci]"
+            git add publications.bib
+            git commit -m "chore: update publications [skip ci]"
             git push
           fi
