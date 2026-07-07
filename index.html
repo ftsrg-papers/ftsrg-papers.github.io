@@ -218,27 +218,30 @@
       margin-top: 0.5rem;
     }
 
-    /* Hide Amazon buy links */
-    .bibbase_amazon { display: none !important; }
-
     /* Dropdown arrows / toggles */
     .dropdown-toggle {
       color: var(--text-muted) !important;
       text-decoration: none !important;
       font-size: 0.8rem !important;
     }
+
+    /* Author names: keep the filter-click behaviour but look like plain text */
+    a.bibbase.author.link {
+      color: inherit !important;
+      text-decoration: none !important;
+      font-style: italic;
+    }
+
+    a.bibbase.author.link:hover {
+      text-decoration: underline !important;
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="header-inner">
-      <h1>ftsrg-papers</h1>
-      <p class="tagline">Research publications &amp; preprints</p>
-      <a class="org-link"
-         href="https://github.com/ftsrg-papers"
-         target="_blank" rel="noopener noreferrer">
-        github.com/ftsrg-papers
-      </a>
+      <h1>ftsrg papers</h1>
+      <p class="tagline">Publications and supplementary materials</p>
     </div>
   </header>
 
