@@ -249,6 +249,50 @@
     <script src="https://bibbase.org/show?bib=https%3A%2F%2Fftsrg-papers.github.io%2Fpublications.bib&jsonp=1&theme=simple&group0=year&sort0=year&sortDir0=desc&showSearch=true&owner=none&urlLabel=supplementary%20materials&noTitleLinks=true"></script>
   </main>
 
+  <script>
+    // Make each whole paper card clickable, pointing at url_website
+    // (falling back to url_pdf), while leaving inner links/toggles alone.
+    (function () {
+      function linkifyCards() {
+        if (!window.bibbase || !Array.isArray(window.bibbase.data)) return;
+
+        window.bibbase.data.forEach(function (paper) {
+          const target = paper.url_website || paper.url_pdf;
+          if (!target) return;
+
+          const card = document.getElementById(paper.bibbaseid);
+          if (!card || card.dataset.cardLinked) return;
+          card.dataset.cardLinked = 'true';
+          card.style.cursor = 'pointer';
+
+          card.addEventListener('click', function (e) {
+            if (e.target.closest('a, button, input, .dropdown-toggle')) return;
+            if (window.getSelection().toString()) return;
+            if (e.ctrlKey || e.metaKey) {
+              window.open(target, '_blank', 'noopener');
+            } else {
+              window.location.href = target;
+            }
+          });
+
+          card.addEventListener('auxclick', function (e) {
+            if (e.button !== 1) return;
+            if (e.target.closest('a, button, input, .dropdown-toggle')) return;
+            window.open(target, '_blank', 'noopener');
+          });
+        });
+      }
+
+      // MutationObserver catches BibBase DOM insertions
+      new MutationObserver(linkifyCards)
+        .observe(document.querySelector('main') || document.body,
+                 { subtree: true, childList: true });
+
+      // Polling fallback for cached/fast JSONP loads
+      [0, 300, 1000, 3000].forEach(function (ms) { setTimeout(linkifyCards, ms); });
+    }());
+  </script>
+
   <footer>
     <a href="https://github.com/ftsrg-papers"
        target="_blank" rel="noopener noreferrer">github.com/ftsrg-papers</a>
