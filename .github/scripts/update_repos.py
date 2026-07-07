@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-"""Fetch all public repos in the ftsrg-papers org that have a
+"""Fetch all repos in the ftsrg-papers org that have a
 public-data.yml on their default branch, parse the YAML, and write
 repos.json for the org index site.
+
+Requires a token with read access to all org repos (public + private)
+stored in the GH_TOKEN environment variable.  With GITHUB_TOKEN only
+public repositories are visible.
 
 Expected public-data.yml fields (all optional):
   title:    string

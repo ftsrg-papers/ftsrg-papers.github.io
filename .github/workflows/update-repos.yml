@@ -40,7 +40,10 @@ jobs:
 
       - name: Update repos.json
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ORG_READ_TOKEN: fine-grained PAT with Contents:read + Metadata:read
+          # on all org repos — required to include private repositories.
+          # Falls back to GITHUB_TOKEN (public repos only) if not set.
+          GH_TOKEN: ${{ secrets.ORG_READ_TOKEN || secrets.GITHUB_TOKEN }}
         run: python .github/scripts/update_repos.py
 
       - name: Commit if changed
