@@ -52,12 +52,12 @@ def _get(url: str):
         raise
 
 
-def get_all_public_repos() -> list:
+def get_all_repos() -> list:
     repos, page = [], 1
     while True:
         batch = _get(
             f"https://api.github.com/orgs/{ORG}/repos"
-            f"?per_page=100&page={page}&type=public&sort=full_name"
+            f"?per_page=100&page={page}&sort=full_name"
         )
         if not batch:
             break
@@ -90,9 +90,9 @@ def get_public_data(repo_name: str) -> dict | None:
 
 
 def main() -> None:
-    print(f"Fetching public repos for org '{ORG}'…")
-    all_repos = get_all_public_repos()
-    print(f"  {len(all_repos)} public repos found.")
+    print(f"Fetching repos for org '{ORG}'…")
+    all_repos = get_all_repos()
+    print(f"  {len(all_repos)} repos found.")
 
     entries = []
     for repo in all_repos:
