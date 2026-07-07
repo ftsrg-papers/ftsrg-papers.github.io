@@ -1,19 +1,19 @@
 name: Update Repository List
 
-# Triggered on a schedule, manually, or via a repository_dispatch event.
+# Runs on a frequent schedule and can be triggered manually.
 #
-# To get near-real-time updates when org repos are created/deleted/renamed,
-# configure an organisation webhook (Settings → Webhooks) with event type
-# "Repositories" and point it at the GitHub Actions REST API:
-#   POST https://api.github.com/repos/ftsrg-papers/ftsrg-papers.github.io/dispatches
-#   body: {"event_type":"repos-changed"}
-# The webhook needs a fine-grained PAT with "actions:write" stored as a
-# webhook secret / passed as a Bearer token.
+# GitHub Actions cannot natively react to org-level repository events
+# (create / delete / rename) in another repository, so polling is the
+# only GitHub-native option.  Because this is a public repo, Actions
+# minutes are free and unlimited.
+#
+# Use the "Run workflow" button in the Actions tab for an immediate
+# refresh after creating or removing a paper repository.
 
 on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes
   workflow_dispatch:
-  repository_dispatch:
-    types: [repos-changed]
 
 # Only one run at a time, globally (group is not scoped to a branch).
 # Any queued run is cancelled when a newer one arrives.

@@ -1,0 +1,40 @@
+name: Keepalive
+
+# GitHub disables scheduled workflows after 60 days of no repository
+# activity.  This workflow runs on the 1st of every month and makes a
+# trivial commit if there has been no other push in the last 50 days,
+# keeping the schedule alive without spamming the history.
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'   # 06:00 UTC on the 1st of every month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need full history to check last-commit date
+
+      - name: Check last commit age
+        id: age
+        run: |
+          last=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          days=$(( (now - last) / 86400 ))
+          echo "days_since_last_commit=$days" >> "$GITHUB_OUTPUT"
+
+      - name: Commit keepalive if stale
+        if: ${{ fromJSON(steps.age.outputs.days_since_last_commit) >= 50 }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty \
+            -m "chore: keepalive [skip ci]" \
+            -m "Prevents GitHub from disabling the scheduled update workflow."
+          git push
